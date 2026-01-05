@@ -6,6 +6,7 @@
 #include <math.h>
 #include <sqstdmath.h>
 
+#include "../../../3rdparty/ai_common_methods/test.hpp"
 #include "../../../safeguards.h"
 
 #define SINGLE_ARG_FUNC(_funcname, num_ops) static SQInteger math_##_funcname(HSQUIRRELVM v){ \
@@ -50,6 +51,29 @@ static SQInteger math_abs(HSQUIRRELVM v)
 	return 1;
 }
 
+/*
+---------------CUSTOM FUNCTIONS---------------
+*/
+static SQInteger math_testadd(HSQUIRRELVM v)
+{
+    SQInteger a, b;
+    // Squirrel stack: [1] is 'this' (the math table), [2] is first arg, [3] is second arg
+    sq_getinteger(v, 2, &a);
+    sq_getinteger(v, 3, &b);
+    
+    // Call your C++ logic
+    SQInteger result = (SQInteger)AI_COMMON::add((int)a, (int)b);
+    
+    // Push the result back to the stack
+    sq_pushinteger(v, result);
+    
+    // Return 1 to tell Squirrel there is 1 return value on the stack
+    return 1;
+}
+/*
+---------------END CUSTOM FUNCTIONS---------------
+*/
+
 SINGLE_ARG_FUNC(sqrt, 100)
 SINGLE_ARG_FUNC(fabs, 1)
 SINGLE_ARG_FUNC(sin, 100)
@@ -88,6 +112,7 @@ static const std::initializer_list<SQRegFunction> mathlib_funcs = {
 #endif /* EXPORT_DEFAULT_SQUIRREL_FUNCTIONS */
 	_DECL_FUNC(fabs,2,".n"),
 	_DECL_FUNC(abs,2,".n"),
+	_DECL_FUNC(testadd, 3, ".nn"), // "3" means 'this' + 2 args. ".nn" checks for 2 numbers.
 };
 
 #ifndef M_PI
