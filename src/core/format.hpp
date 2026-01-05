@@ -1,54 +1,49 @@
-/*
- * This file is part of OpenTTD.
- * OpenTTD is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 2.
- * OpenTTD is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with OpenTTD. If not, see <https://www.gnu.org/licenses/old-licenses/gpl-2.0>.
- */
-
-/** @file format.hpp String formatting functions and helpers. */
-
 #ifndef FORMAT_HPP
 #define FORMAT_HPP
 
 #include "../3rdparty/fmt/format.h"
 #include "convertible_through_base.hpp"
 
-template <typename E, typename Char> requires std::is_enum_v<E>
-struct fmt::formatter<E, Char> : fmt::formatter<typename std::underlying_type_t<E>> {
-	using underlying_type = typename std::underlying_type_t<E>;
-	using parent = typename fmt::formatter<underlying_type>;
-
-	constexpr fmt::format_parse_context::iterator parse(fmt::format_parse_context &ctx)
-	{
-		return parent::parse(ctx);
-	}
-
-	fmt::format_context::iterator format(const E &e, fmt::format_context &ctx) const
-	{
-		return parent::format(underlying_type(e), ctx);
-	}
+/** Helper to choose the target type for formatting without invalidating std::underlying_type. */
+template <typename T, bool IsEnum>
+struct OpenTTD_FormatTarget {
+    using type = typename T::BaseType;
 };
 
-template <ConvertibleThroughBase T, typename Char>
-struct fmt::formatter<T, Char> : fmt::formatter<typename T::BaseType> {
-	using underlying_type = typename T::BaseType;
-	using parent = typename fmt::formatter<underlying_type>;
+template <typename T>
+struct OpenTTD_FormatTarget<T, true> {
+    using type = std::underlying_type_t<T>;
+};
 
-	constexpr fmt::format_parse_context::iterator parse(fmt::format_parse_context &ctx)
-	{
-		return parent::parse(ctx);
-	}
+/**
+ * Combined formatter for Enums and types that use ConvertibleThroughBase.
+ * This specialization belongs in the fmt namespace.
+ */
+template <typename T, typename Char>
+requires std::is_enum_v<T> || ConvertibleThroughBase<T>
+struct fmt::formatter<T, Char> {
+    using target_type = typename OpenTTD_FormatTarget<T, std::is_enum_v<T>>::type;
+    fmt::formatter<target_type, Char> format_impl;
 
-	fmt::format_context::iterator format(const T &t, fmt::format_context &ctx) const
-	{
-		return parent::format(t.base(), ctx);
-	}
+    constexpr auto parse(fmt::format_parse_context &ctx)
+    {
+        return format_impl.parse(ctx);
+    }
+
+    auto format(const T &t, fmt::format_context &ctx) const
+    {
+        if constexpr (std::is_enum_v<T>) {
+            return format_impl.format(static_cast<target_type>(t), ctx);
+        } else {
+            return format_impl.format(t.base(), ctx);
+        }
+    }
 };
 
 template <class... Args>
 void format_append(std::string &out, fmt::format_string<Args...> &&fmt, Args&&... args)
 {
-	fmt::format_to(std::back_inserter(out), std::forward<decltype(fmt)>(fmt), std::forward<decltype(args)>(args)...);
+    fmt::format_to(std::back_inserter(out), std::forward<decltype(fmt)>(fmt), std::forward<decltype(args)>(args)...);
 }
 
 #endif /* FORMAT_HPP */

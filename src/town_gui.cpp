@@ -54,6 +54,8 @@
 
 #include "safeguards.h"
 
+#include <sstream>
+
 TownKdtree _town_local_authority_kdtree{};
 
 typedef GUIList<const Town*, const bool &> GUITownList;

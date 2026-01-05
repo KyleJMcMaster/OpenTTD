@@ -24,6 +24,8 @@
 
 #include "safeguards.h"
 
+#include <sstream>
+
 std::string _ini_videodriver;        ///< The video driver a stored in the configuration file.
 std::vector<Dimension> _resolutions; ///< List of resolutions.
 Dimension _cur_resolution;           ///< The current resolution.

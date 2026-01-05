@@ -54,6 +54,8 @@
 
 #include "safeguards.h"
 
+#include <sstream>
+
 /* scriptfile handling */
 static uint _script_current_depth; ///< Depth of scripts running (used to abort execution when #ConReturn is encountered).
 

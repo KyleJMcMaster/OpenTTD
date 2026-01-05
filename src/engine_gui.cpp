@@ -32,6 +32,8 @@
 
 #include "safeguards.h"
 
+#include <sstream>
+
 /**
  * Return the category of an engine.
  * @param engine Engine to examine.

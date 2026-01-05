@@ -21,6 +21,8 @@
 
 #include "safeguards.h"
 
+#include <sstream>
+
 CargoSpec CargoSpec::array[NUM_CARGO];
 std::array<std::vector<const CargoSpec *>, NUM_TPE> CargoSpec::town_production_cargoes{};
 
