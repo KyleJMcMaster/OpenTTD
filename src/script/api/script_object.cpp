@@ -26,6 +26,8 @@
 
 #include "../../safeguards.h"
 
+#include "../../3rdparty/ai_common_methods/test.hpp"
+
 void SimpleCountedObject::Release()
 {
 	int32_t res = --this->ref_count;
@@ -369,3 +371,17 @@ ScriptObject::DisableDoCommandScope::DisableDoCommandScope()
 
 	throw Script_FatalError("This instance is not cloneable");
 }
+
+
+/*
+	-------------------------------CUSTOM FUNCTIONS-----------------------------
+*/
+
+/* static */ int ScriptObject::TestAdd(int a, int b)
+{
+    return AI_COMMON::add(a, b);
+}
+
+/*
+-------------------------------END CUSTOM FUNCTIONS-----------------------------
+*/

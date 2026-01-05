@@ -152,6 +152,21 @@ public:
 	 */
 	static SQInteger _cloned(HSQUIRRELVM);
 
+	/*
+	-------------------------------CUSTOM FUNCTIONS-----------------------------
+	*/
+	/**
+     * Adds two integers.
+     * @param a First number.
+     * @param b Second number.
+     * @return The sum.
+     */
+    static int TestAdd(int a, int b); 
+
+	/*
+	-------------------------------END CUSTOM FUNCTIONS-----------------------------
+	*/
+
 protected:
 	template <Commands TCmd, typename T> struct ScriptDoCommandHelper;
 
